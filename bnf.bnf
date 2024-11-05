@@ -5,4 +5,13 @@
 <factor> ::= <identifier> | "(" <expression> ")"
 <identifier> ::= ([a-z] | [A-Z] | [0-9])+
 
+----
+<expression> ::= <or_expression>
+<or_expression> ::= <and_expression> ("." <and_expression>)*
+<and_expression> ::= <term> ("*" <term>)*
+<term> ::= <factor> | <ternary>
+<ternary> ::= <expression> "->" <expression> "," <expression>
+<factor> ::= <identifier> | "(" <expression> ")"
+<identifier> ::= ([a-z] | [A-Z] | [0-9])+
+
 c=(a->c,d)->e,g;
