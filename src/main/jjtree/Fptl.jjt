@@ -2,6 +2,7 @@
 // a->c,d->e,f;
 options {
 MULTI=true;
+VISITOR=true;
 }
 
 PARSER_BEGIN(FptlParser)
@@ -62,10 +63,10 @@ void Concatenation() :
     Term() (<STAR> Term())*
 }
 
-void Term() #void:
+void Term() :
 {}
 {
-    Factor() (<ARROW> (Factor() <COMMA> Factor())#TernaryRightPart)*
+    Factor() (<ARROW> Factor() <COMMA> Factor())*
 }
 
 void Factor() #void:
@@ -79,5 +80,6 @@ void Identifier():
 {Token t;}
 {
     t=<IDENTIFIER>
-    {jjtThis.jjtSetValue(t.getValue());}
+    {jjtThis.jjtSetValue(t.image);}
+
 }
