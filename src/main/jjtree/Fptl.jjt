@@ -1,0 +1,70 @@
+PARSER_BEGIN(FptlParser)
+package ru.fptlvisualizer.parser;
+
+public class FptlParser {
+    public static void main(String[] args) throws ParseException, TokenMgrError  {
+    System.out.println("Reading from standard input...");
+    FptlParser t = new FptlParser(System.in);
+    try {
+      SimpleNode n = t.Function();
+      n.dump("");
+      System.out.println("Thank you.");
+    } catch (Exception e) {
+      System.out.println("Oops.");
+      System.out.println(e.getMessage());
+      e.printStackTrace();
+    }
+    }
+}
+
+PARSER_END(FptlParser)
+
+SKIP : { " " | "\t" | "\n" | "\r" }
+
+TOKEN : {< IDENTIFIER: (["a"-"z", "A"-"Z", "0"-"9", "[", "]", "@", "_"])+>} // identifiers and digits
+TOKEN : {< EQUAL: "=" >}
+TOKEN : {< SEMICOLON: ";" >}
+TOKEN : {< DOT: "." >}
+TOKEN : {< STAR: "*" >}
+TOKEN : {< ARROW: "->" >}
+TOKEN : {< COMMA: "," >}
+TOKEN : {< LPAREN: "(" >}
+TOKEN : {< RPAREN: ")" >}
+
+SimpleNode Function() :
+{}
+{
+    <IDENTIFIER> <EQUAL> Expression() <SEMICOLON>
+    { return jjtThis; }
+}
+
+void Expression() #void:
+{}
+{
+    Composition()
+}
+
+void Composition():
+{}
+{
+    Concatenation() (<DOT> Concatenation())*
+}
+
+void Concatenation():
+{}
+{
+    Term() (<STAR> Term())*
+}
+
+void Term():
+{}
+{
+    Factor() (<ARROW> Factor() <COMMA> Factor())*
+}
+
+void Factor():
+{
+}
+{
+    <IDENTIFIER> | <LPAREN> Expression() <RPAREN>
+}

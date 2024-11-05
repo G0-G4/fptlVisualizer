@@ -1,0 +1,8 @@
+<expression> ::= <composition>
+<composition> ::= <concatenation> ("." <concatenation>)*
+<concatenation> ::= <term> ("*" <term>)*
+<term> ::= <factor> ("->" <factor> "," <factor>)*
+<factor> ::= <identifier> | "(" <expression> ")"
+<identifier> ::= ([a-z] | [A-Z] | [0-9])+
+
+c=(a->c,d)->e,g;
