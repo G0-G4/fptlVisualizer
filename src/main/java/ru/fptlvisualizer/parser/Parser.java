@@ -11,6 +11,7 @@ public class Parser {
     InputStream stream = new ByteArrayInputStream(code.getBytes());
     FptlParser parser = new FptlParser(stream);
     ru.fptlvisualizer.parser.SimpleNode n = parser.Function();
-    n.dump("");
+    PrintingVisitor visitor = new PrintingVisitor();
+    visitor.visit(n, null);
   }
 }
