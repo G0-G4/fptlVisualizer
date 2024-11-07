@@ -1,6 +1,7 @@
 package ru.fptlvisualizer.parser;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -26,36 +27,36 @@ class Polish {
     Stack<String> stack = new Stack<>();
     List<String> result = new ArrayList<>();
 
-    for (String token: expression) {
-      if (token.matches(literal)) {
-        result.add(token);
-      }
-      else if ("(".equals(token)) {
-        stack.push("(");
-      }
-      else if (")".equals(token)) {
-        while (!"(".equals(stack.peek())) {
-          result.add(stack.pop());
+    try {
+      for (String token : expression) {
+        if (token.matches(literal)) {
+          result.add(token);
+        } else if ("(".equals(token)) {
+          stack.push("(");
+        } else if (")".equals(token)) {
+          while (!"(".equals(stack.peek())) {
+            result.add(stack.pop());
+          }
+          stack.pop();
+        } else if (",".equals(token)) {
+          while (!"->".equals(stack.peek())) {
+            result.add(stack.pop());
+          }
+        } else if (".".equals(token) || "*".equals(token) || "->".equals(token)) {
+          while (!stack.isEmpty() && isOperation(stack.peek()) && isOperationBefore(stack.peek(), token)) {
+            result.add(stack.pop());
+          }
+          stack.push(token);
         }
-        stack.pop();
       }
-      else if (",".equals(token)) {
-        while (!"->".equals(stack.peek())) {
-          result.add(stack.pop());
+      while (!stack.isEmpty()) {
+        if (!isOperation(stack.peek())) {
+          throw new IllegalArgumentException();
         }
+        result.add(stack.pop());
       }
-      else if (".".equals(token) || "*".equals(token) || "->".equals(token)) {
-        while (!stack.isEmpty() && isOperation(stack.peek()) && isOperationBefore(stack.peek(), token)) {
-          result.add(stack.pop());
-        }
-        stack.push(token);
-      }
-    }
-    while(!stack.isEmpty()) {
-      if (!isOperation(stack.peek())) {
-        throw new IllegalArgumentException();
-      }
-      result.add(stack.pop());
+    } catch (EmptyStackException e) {
+      throw new IllegalArgumentException("error while converting to polish notation", e);
     }
     return result;
   }

@@ -15,6 +15,11 @@ public class Literal extends Expression {
   }
 
   @Override
+  public Type getType() {
+    return Type.LITERAL;
+  }
+
+  @Override
   public String toString() {
     return literal;
   }

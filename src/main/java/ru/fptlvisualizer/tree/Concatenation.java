@@ -4,12 +4,25 @@ import java.util.Objects;
 
 public class Concatenation extends Expression {
 
-  Expression left;
-  Expression right;
+  private final Expression left;
+  private final Expression right;
 
   public Concatenation(Expression left, Expression right) {
     this.left = left;
     this.right = right;
+  }
+
+  public Expression getLeft() {
+    return left;
+  }
+
+  public Expression getRight() {
+    return right;
+  }
+
+  @Override
+  public Type getType() {
+    return Type.CONCATENATION;
   }
 
   @Override
@@ -31,6 +44,8 @@ public class Concatenation extends Expression {
 
   @Override
   public String toString() {
-    return "(" + left + "*" + right + ")"; // TODO печатать скобочки, только где необходимо
+    String leftRepresentation = left.getType().getOrder() > Type.CONCATENATION.getOrder() ? "(" + left + ")" : left.toString();
+    String rightRepresentation = right.getType().getOrder() > Type.CONCATENATION.getOrder() ? "(" + right + ")" : right.toString();
+    return leftRepresentation + "*" + rightRepresentation;
   }
 }

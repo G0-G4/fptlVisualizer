@@ -4,8 +4,16 @@ import java.util.Objects;
 
 public class Composition extends Expression {
 
-  public Expression left;
-  public Expression right;
+  private final Expression left;
+  private final Expression right;
+
+  public Expression getLeft() {
+    return left;
+  }
+
+  public Expression getRight() {
+    return right;
+  }
 
   public Composition(Expression left, Expression right) {
     this.left = left;
@@ -13,8 +21,15 @@ public class Composition extends Expression {
   }
 
   @Override
+  public Type getType() {
+    return Type.COMPOSITION;
+  }
+
+  @Override
   public String toString() {
-    return "(" + left + "." + right + ")";
+    String leftRepresentation = left.getType().getOrder() > Type.COMPOSITION.getOrder() ? "(" + left + ")" : left.toString();
+    String rightRepresentation = right.getType().getOrder() > Type.COMPOSITION.getOrder() ? "(" + right + ")" : right.toString();
+    return leftRepresentation + "." + rightRepresentation;
   }
 
   @Override
