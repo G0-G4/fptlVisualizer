@@ -3,7 +3,7 @@ package ru.fptlvisualizer.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tokenizer {
+class Tokenizer {
 
   private enum State {
     literal,

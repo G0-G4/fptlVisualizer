@@ -5,30 +5,30 @@ import java.util.Objects;
 public class Ternary extends Expression {
 
   private final Expression condition;
-  private final Expression trueCase;
-  private final Expression falseCase;
+  private final Expression trueBranch;
+  private final Expression falseBranch;
 
-  public Ternary(Expression condition, Expression trueCase, Expression falseCase) {
+  public Ternary(Expression condition, Expression trueBranch, Expression falseBranch) {
     this.condition = condition;
-    this.trueCase = trueCase;
-    this.falseCase = falseCase;
+    this.trueBranch = trueBranch;
+    this.falseBranch = falseBranch;
   }
 
   public Expression getCondition() {
     return condition;
   }
 
-  public Expression getTrueCase() {
-    return trueCase;
+  public Expression getTrueBranch() {
+    return trueBranch;
   }
 
-  public Expression getFalseCase() {
-    return falseCase;
+  public Expression getFalseBranch() {
+    return falseBranch;
   }
 
   @Override
   public String toString() {
-    return condition + " -> " + trueCase + ", " + falseCase;
+    return "(" + condition + "->" + trueBranch + "," + falseBranch + ")";
   }
 
   @Override
@@ -40,14 +40,14 @@ public class Ternary extends Expression {
       return false;
     }
     Ternary ternary = (Ternary) o;
-    return Objects.equals(condition, ternary.condition) && Objects.equals(trueCase, ternary.trueCase) && Objects.equals(
-        falseCase,
-        ternary.falseCase
+    return Objects.equals(condition, ternary.condition) && Objects.equals(trueBranch, ternary.trueBranch) && Objects.equals(
+        falseBranch,
+        ternary.falseBranch
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(condition, trueCase, falseCase);
+    return Objects.hash(condition, trueBranch, falseBranch);
   }
 }
