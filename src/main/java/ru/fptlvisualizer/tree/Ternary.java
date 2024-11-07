@@ -34,7 +34,6 @@ public class Ternary extends Expression {
   @Override
   public String toString() {
     String conditionRepresentation = condition.getType() == Type.TERNARY ? "(" + condition + ")" : condition.toString();
-    String trueBranchRepresentation = trueBranch.getType() == Type.TERNARY ? "(" + trueBranch + ")" : trueBranch.toString();
     return conditionRepresentation + "->" + trueBranch + "," + falseBranch;
   }
 

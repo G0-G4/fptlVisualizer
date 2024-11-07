@@ -25,7 +25,7 @@ class PolishTest {
         Arguments.of("a*b", "a b *"),
         Arguments.of("((a.b))", "a b ."),
         Arguments.of("a->b,c", "a b c ->"),
-        Arguments.of("a->b->c,d,e", "a b c d -> e ->"), // syntax error in fptl
+        //Arguments.of("a->b->c,d,e", "a b c d -> e ->"), // syntax error in fptl
         Arguments.of("a->(b->c,d),e", "a b c d -> e ->"),
         Arguments.of("a->b,c->d,e", "a b c d e -> ->"),
         Arguments.of("a*b.c*e", "a b c . * e *"),
