@@ -46,6 +46,6 @@ public class Composition extends Expression {
 
   @Override
   public int hashCode() {
-    return Objects.hash(left, right); // TODO печатать скобочки, только где необходимо;
+    return Objects.hash(left, right);
   }
 }

@@ -3,8 +3,7 @@ module ru.fptlvisualizer {
   requires javafx.fxml;
 
   requires org.controlsfx.controls;
-  requires io.github.eckig.grapheditor.api;
-  requires io.github.eckig.grapheditor.core;
+  requires smartgraph;
 
   opens ru.fptlvisualizer to javafx.fxml;
   exports ru.fptlvisualizer;
