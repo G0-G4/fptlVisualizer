@@ -2,7 +2,7 @@ package ru.fptlvisualizer.tree;
 
 import java.util.Objects;
 
-public class Composition extends Expression {
+public final class Composition extends Expression {
 
   private final Expression left;
   private final Expression right;

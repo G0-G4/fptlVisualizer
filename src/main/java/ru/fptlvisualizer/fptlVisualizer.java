@@ -5,7 +5,6 @@ import com.brunomnsilva.smartgraph.graph.DigraphEdgeList;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
-import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,7 +16,7 @@ import javafx.stage.Stage;
 public class fptlVisualizer extends Application {
   Controller controller = new Controller();
   @Override
-  public void start(Stage stage) throws IOException {
+  public void start(Stage stage) {
 
     Pane root = new VBox();
     TextArea textArea = new TextArea();
@@ -28,8 +27,11 @@ public class fptlVisualizer extends Application {
     controller.setGraph(g);
     SmartPlacementStrategy initialPlacement = new SmartCircularSortedPlacementStrategy();
     SmartGraphPanel<Vertex, Edge> graphView = new SmartGraphPanel<>(g, initialPlacement);
-    graphView.setMinHeight(100);
-    graphView.setAutomaticLayout(true);
+    controller.setGraphPanel(graphView);
+    graphView.setMinHeight(500);
+    graphView.setMinWidth(1024);
+//    graphView.setAutomaticLayout(true);
+    graphView.layout();
     root.getChildren().addAll(textArea, buildGraph, graphView);
 
     Scene scene = new Scene(root);

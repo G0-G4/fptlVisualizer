@@ -2,7 +2,7 @@ package ru.fptlvisualizer.tree;
 
 import java.util.Objects;
 
-public class Literal extends Expression {
+public final class Literal extends Expression {
 
   private final String literal;
 

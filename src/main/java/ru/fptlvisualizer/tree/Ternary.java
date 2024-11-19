@@ -2,7 +2,7 @@ package ru.fptlvisualizer.tree;
 
 import java.util.Objects;
 
-public class Ternary extends Expression {
+public final class Ternary extends Expression {
 
   private final Expression condition;
   private final Expression trueBranch;

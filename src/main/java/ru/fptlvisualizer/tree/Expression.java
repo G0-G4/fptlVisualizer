@@ -1,7 +1,7 @@
 package ru.fptlvisualizer.tree;
 
 
-public abstract class Expression {
+public sealed abstract class Expression permits Composition, Concatenation, Literal, Ternary {
 
   public enum Type {
 
