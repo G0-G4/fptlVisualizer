@@ -1,5 +1,6 @@
 package ru.fptlvisualizer;
 
+import com.brunomnsilva.smartgraph.containers.ContentZoomScrollPane;
 import com.brunomnsilva.smartgraph.graph.Digraph;
 import com.brunomnsilva.smartgraph.graph.DigraphEdgeList;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
@@ -27,12 +28,13 @@ public class fptlVisualizer extends Application {
     controller.setGraph(g);
     SmartPlacementStrategy initialPlacement = new SmartCircularSortedPlacementStrategy();
     SmartGraphPanel<Vertex, Edge> graphView = new SmartGraphPanel<>(g, initialPlacement);
+    var pane = new ContentZoomScrollPane(graphView);
     controller.setGraphPanel(graphView);
     graphView.setMinHeight(500);
     graphView.setMinWidth(1024);
 //    graphView.setAutomaticLayout(true);
     graphView.layout();
-    root.getChildren().addAll(textArea, buildGraph, graphView);
+    root.getChildren().addAll(textArea, buildGraph, pane);
 
     Scene scene = new Scene(root);
     stage.setScene(scene);
