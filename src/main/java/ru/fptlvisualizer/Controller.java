@@ -10,7 +10,6 @@ import ru.fptlvisualizer.tree.Literal;
 import ru.fptlvisualizer.tree.Ternary;
 
 public class Controller {
-  private Expression expression;
   private Graph<Vertex, Edge> g;
   private SmartGraphPanel<Vertex, Edge> panel;
   int counter = 0;
@@ -25,7 +24,7 @@ public class Controller {
   }
 
   protected void onButtonClick(String code) {
-    expression = Parser.parse(code);
+    Expression expression = Parser.parse(code);
     System.out.println(expression);
     drawGraph(expression, 500, 100);
   }
