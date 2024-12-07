@@ -1,8 +1,8 @@
 package ru.fptlvisualizer;
 
-public record Edge(Vertex a, Vertex b, String name) {
+public record MyEdge(MyVertex a, MyVertex b, String name) {
 
-  public Edge(Vertex a, Vertex b) {
+  public MyEdge(MyVertex a, MyVertex b) {
     this(a, b, "");
   }
 

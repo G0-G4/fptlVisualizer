@@ -1,4 +1,4 @@
 package ru.fptlvisualizer;
 
-public record InOut (Vertex in, Vertex out, double maxY){
+public record InOut (MyVertex in, MyVertex out, double maxY){
 }

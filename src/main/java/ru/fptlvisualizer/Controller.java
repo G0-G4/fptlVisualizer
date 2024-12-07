@@ -10,26 +10,34 @@ import ru.fptlvisualizer.tree.Literal;
 import ru.fptlvisualizer.tree.Ternary;
 
 public class Controller {
-  private Graph<Vertex, Edge> g;
-  private SmartGraphPanel<Vertex, Edge> panel;
+  private Graph<MyVertex, MyEdge> g;
+  private SmartGraphPanel<MyVertex, MyEdge> panel;
   int counter = 0;
   int dx = 50;
+  MyVertex start = null;
 
-  public void setGraph(Graph<Vertex, Edge> g) {
+  public void setGraph(Graph<MyVertex, MyEdge> g) {
     this.g = g;
   }
 
-  public void setGraphPanel(SmartGraphPanel<Vertex, Edge> panel) {
+  public void setGraphPanel(SmartGraphPanel<MyVertex, MyEdge> panel) {
     this.panel = panel;
   }
 
   protected void onButtonClick(String code) {
     Expression expression = Parser.parse(code);
-    System.out.println(expression);
+    clearGraph();
     drawGraph(expression, 500, 100);
+    System.out.println(g);
+    start = g.vertices()
+        .stream()
+        .min((a, b) -> (int) (a.element().x() - b.element().x()))
+        .get().element();
+    System.out.println(graphToExpression(start));
   }
 
   private InOut drawGraph(Expression exp, double lastX, double lastY) {
+    // TODO rewrite with custom grapgh implementation to simplify graph to expression conversion
     if (exp instanceof Composition composition) {
       var left = drawGraph(composition.getLeft(), lastX, lastY);
       var right = drawGraph(composition.getRight(), left.out().x(), lastY);
@@ -45,6 +53,9 @@ public class Controller {
       var openX = Math.min(inOutLeft.in().x(), inOutRight.in().x()) - dx;
       var open = getVertex("*", openX, lastY);
       var close = getVertex("*", closeX, lastY);
+//      TODO fix bug when (a*b)*(c*d) there * connects with *
+//      if (left.getType() == Expression.Type.CONCATENATION && right.getType() == Expression.Type.CONCATENATION) {
+//      }
       if (left.getType() == Expression.Type.CONCATENATION) {
         open = inOutLeft.in();
         close = inOutLeft.out();
@@ -61,8 +72,6 @@ public class Controller {
         panel.updateAndWait();
         panel.setVertexPosition(o, openX, lastY);
         panel.setVertexPosition(c, closeX, lastY);
-        System.out.println("set * open to " + (lastX));
-        System.out.println("set * close to " + closeX);
         addEdge(open, inOutLeft.in());
         addEdge(open, inOutRight.in());
         addEdge(inOutLeft.out(), close);
@@ -96,21 +105,58 @@ public class Controller {
       var v = g.insertVertex(vertex);
       panel.updateAndWait();
       panel.setVertexPosition(v, x, lastY);
-      System.out.println("set " + literal.getLiteral() + " to " + x + " " + lastY);
       return new InOut(vertex, vertex, lastY);
     }
     throw new IllegalStateException("unexpected expression type " + exp.getClass());
   }
 
-  private Vertex getVertex(String name, double x, double y) {
-    return new Vertex(name, x, y, counter++);
+  private MyVertex getVertex(String name, double x, double y) {
+    var vertex = new MyVertex(name, x, y, counter++);
+    if (start == null) {
+      start = vertex;
+    }
+    return vertex;
   }
 
-  private void addEdge(Vertex a, Vertex b) {
-    g.insertEdge(a, b, new Edge(a, b));
+  private void addEdge(MyVertex a, MyVertex b) {
+    a.addChild(b);
+    g.insertEdge(a, b, new MyEdge(a, b));
   }
 
-  private void addEdge(Vertex a, Vertex b, String name) {
-    g.insertEdge(a, b, new Edge(a, b, name));
+  private void addEdge(MyVertex a, MyVertex b, String name) {
+    a.addChild(b);
+    g.insertEdge(a, b, new MyEdge(a, b, name));
+  }
+
+  private Expression graphToExpression(MyVertex curr) {
+    if ("*".equals(curr.getName())) { //TODO в вершине операций хранить закрывающую вершину и продолжать парсить оттуда?
+      return curr.getChildren().stream()
+          .map(this::graphToExpression)
+          .reduce(Concatenation::new)
+          .get();
+    } else if ("->".equals(curr.getName())) {
+      var trueBranch = graphToExpression(curr.getChildren().get(0));
+      var falseBranch = graphToExpression(curr.getChildren().get(1));
+      var condition = graphToExpression(curr.getChildren().get(2));
+      return new Ternary(condition, trueBranch, falseBranch);
+    } else {
+      var literal = new Literal(curr.getName());
+      MyVertex child = null;
+      if (curr.getChildren().size() == 1) {
+        child = curr.getChildren().get(0);
+      }
+
+      if (child == null || "*".equals(child.getName()) || "->".equals(child.getName())) {
+        //TODO или тут как-то обрабатывать детей операций
+        return literal;
+      }
+      return new Composition(literal, graphToExpression(child));
+    }
+  }
+
+  private void clearGraph() {
+    for (var vertex : g.vertices()) {
+      g.removeVertex(vertex);
+    }
   }
 }

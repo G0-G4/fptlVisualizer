@@ -24,10 +24,10 @@ public class fptlVisualizer extends Application {
 
     Button buildGraph = new Button("отобразить");
 
-    Digraph<Vertex, Edge> g = new DigraphEdgeList<>();
+    Digraph<MyVertex, MyEdge> g = new DigraphEdgeList<>();
     controller.setGraph(g);
     SmartPlacementStrategy initialPlacement = new SmartCircularSortedPlacementStrategy();
-    SmartGraphPanel<Vertex, Edge> graphView = new SmartGraphPanel<>(g, initialPlacement);
+    SmartGraphPanel<MyVertex, MyEdge> graphView = new SmartGraphPanel<>(g, initialPlacement);
     var pane = new ContentZoomScrollPane(graphView);
     controller.setGraphPanel(graphView);
     graphView.setMinHeight(500);
