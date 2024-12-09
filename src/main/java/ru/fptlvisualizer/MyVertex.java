@@ -10,6 +10,7 @@ public class MyVertex {
   private double y;
   private final int id;
   private List<MyVertex> children = new ArrayList<>();
+  private MyVertex closing = null;
 
   public MyVertex(String name, double x, double y, int id) {
     this.name = name;
@@ -40,6 +41,14 @@ public class MyVertex {
 
   public int getId() {
     return id;
+  }
+
+  public void setClosing(MyVertex closing) {
+    this.closing = closing;
+  }
+
+  public MyVertex getClosing() {
+    return closing;
   }
 
   @Override

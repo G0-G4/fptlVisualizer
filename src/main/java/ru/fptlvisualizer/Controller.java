@@ -77,6 +77,7 @@ public class Controller {
         addEdge(inOutLeft.out(), close);
         addEdge(inOutRight.out(), close);
       }
+      open.setClosing(close);
       return new InOut(open, close, inOutRight.maxY());
     }
     if (exp instanceof Ternary ternary) {
@@ -97,6 +98,7 @@ public class Controller {
       addEdge(open, falseBranch.in());
       addEdge(falseBranch.out(), close);
       addEdge(open, condition.in());
+      open.setClosing(close);
       return new InOut(open, close, falseBranch.maxY());
     }
     if (exp instanceof Literal literal) {
@@ -129,16 +131,33 @@ public class Controller {
   }
 
   private Expression graphToExpression(MyVertex curr) {
-    if ("*".equals(curr.getName())) { //TODO в вершине операций хранить закрывающую вершину и продолжать парсить оттуда?
-      return curr.getChildren().stream()
+    if ("*".equals(curr.getName())) {
+      var expr =  curr.getChildren().stream()
           .map(this::graphToExpression)
           .reduce(Concatenation::new)
           .get();
+      MyVertex opEnd = curr.getClosing();
+      if (opEnd != null && !opEnd.getChildren().isEmpty()) {
+        var right = graphToExpression(opEnd.getChildren().get(0));
+        return  right != null ? new Composition(expr, graphToExpression(opEnd.getChildren().get(0))) : expr;
+      }
+      return expr;
+
     } else if ("->".equals(curr.getName())) {
+      if (curr.getChildren().isEmpty()) {
+        return  null;
+      }
+      System.out.println(curr);
       var trueBranch = graphToExpression(curr.getChildren().get(0));
       var falseBranch = graphToExpression(curr.getChildren().get(1));
       var condition = graphToExpression(curr.getChildren().get(2));
-      return new Ternary(condition, trueBranch, falseBranch);
+      var expr = new Ternary(condition, trueBranch, falseBranch);
+      MyVertex opEnd = curr.getClosing();
+      if (opEnd != null && !opEnd.getChildren().isEmpty()) {
+        var right = graphToExpression(opEnd.getChildren().get(0));
+        return  right != null ? new Composition(expr, graphToExpression(opEnd.getChildren().get(0))) : expr;
+      }
+      return expr;
     } else {
       var literal = new Literal(curr.getName());
       MyVertex child = null;
@@ -147,10 +166,10 @@ public class Controller {
       }
 
       if (child == null || "*".equals(child.getName()) || "->".equals(child.getName())) {
-        //TODO или тут как-то обрабатывать детей операций
         return literal;
       }
-      return new Composition(literal, graphToExpression(child));
+      var right = graphToExpression(child);
+      return right != null ? new Composition(literal, graphToExpression(child)) : literal;
     }
   }
 
