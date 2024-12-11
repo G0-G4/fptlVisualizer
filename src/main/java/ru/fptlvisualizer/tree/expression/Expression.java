@@ -1,4 +1,4 @@
-package ru.fptlvisualizer.tree;
+package ru.fptlvisualizer.tree.expression;
 
 
 public sealed abstract class Expression permits Composition, Concatenation, Literal, Ternary {

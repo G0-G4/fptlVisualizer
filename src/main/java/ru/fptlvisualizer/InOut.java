@@ -1,4 +1,6 @@
 package ru.fptlvisualizer;
 
-public record InOut (MyVertex in, MyVertex out, double maxY){
+import ru.fptlvisualizer.tree.graph.ExpressionVertex;
+
+public record InOut (MyVertex in, MyVertex out, double maxY, ExpressionVertex vertex){
 }

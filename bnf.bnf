@@ -19,3 +19,5 @@ c=(a->c,d)->e,g;
 (N * 0).equal -> (0 * 0), ((N * 1).sub * ((rand *rand).f * (N * 1).sub.integrate.a2).add)
 
 (a1 * 0).equal -> 1, ((a1 * 1).sub.Fact * a1).mul
+
+a.(b*c*d).e.f

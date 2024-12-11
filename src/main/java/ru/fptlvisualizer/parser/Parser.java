@@ -3,11 +3,11 @@ package ru.fptlvisualizer.parser;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
-import ru.fptlvisualizer.tree.Composition;
-import ru.fptlvisualizer.tree.Concatenation;
-import ru.fptlvisualizer.tree.Expression;
-import ru.fptlvisualizer.tree.Literal;
-import ru.fptlvisualizer.tree.Ternary;
+import ru.fptlvisualizer.tree.expression.Composition;
+import ru.fptlvisualizer.tree.expression.Concatenation;
+import ru.fptlvisualizer.tree.expression.Expression;
+import ru.fptlvisualizer.tree.expression.Literal;
+import ru.fptlvisualizer.tree.expression.Ternary;
 
 public class Parser {
 

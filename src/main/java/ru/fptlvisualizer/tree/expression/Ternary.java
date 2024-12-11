@@ -1,4 +1,4 @@
-package ru.fptlvisualizer.tree;
+package ru.fptlvisualizer.tree.expression;
 
 import java.util.Objects;
 
