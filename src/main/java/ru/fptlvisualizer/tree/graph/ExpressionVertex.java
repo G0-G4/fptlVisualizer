@@ -19,7 +19,6 @@ public abstract class ExpressionVertex {
   private ExpressionVertex rightEndOfOperation;
 
   public ExpressionVertex(String name) {
-    System.out.println("creating vertex " + name + " with x=" + x + ", y=" + y);
     this.id = ID++;
     this.name = name;
   }
@@ -50,7 +49,7 @@ public abstract class ExpressionVertex {
 
   public void removeChild(ExpressionVertex child) {
     children.remove(child);
-//    child.parents.remove(this);
+    child.parents.remove(this);
   }
 
   public void removeParent(ExpressionVertex parent) {
