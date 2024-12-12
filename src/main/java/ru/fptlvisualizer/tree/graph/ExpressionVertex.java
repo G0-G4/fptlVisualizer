@@ -4,6 +4,7 @@ package ru.fptlvisualizer.tree.graph;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class ExpressionVertex {
   public static int ID = 0;
@@ -12,10 +13,10 @@ public abstract class ExpressionVertex {
   private double y;
   private final int id;
   private List<ExpressionVertex> children = new ArrayList<>();
-  protected ExpressionVertex closing;
+  protected ExpressionVertex lastOperand;
   public static Double X = null;
-  public static ExpressionVertex START = null;
   public static List<ExpressionVertex> expressions = new ArrayList<>();
+  private ExpressionVertex rightEndOfOperation;
 
   public ExpressionVertex(String name) {
     System.out.println("creating vertex " + name + " with x=" + x + ", y=" + y);
@@ -24,15 +25,15 @@ public abstract class ExpressionVertex {
     expressions.add(this);
   }
 
-  public ExpressionVertex getClosing() {
-    if (closing == null) {
+  public ExpressionVertex getLastOperand() {
+    if (lastOperand == null) {
       System.out.println();
     }
-    return closing;
+    return lastOperand;
   }
 
-  public void setClosing(ExpressionVertex closing) {
-    this.closing = closing;
+  public void setLastOperand(ExpressionVertex lastOperand) {
+    this.lastOperand = lastOperand;
   }
 
   public void addChild(ExpressionVertex child) {
@@ -43,17 +44,37 @@ public abstract class ExpressionVertex {
     return Collections.unmodifiableList(children);
   }
 
+  public Optional<ExpressionVertex> getComposed() {
+    if (getChildren().size() == 1) {
+      var child = getChildren().get(0);
+      if (!child.isRightEndOfOperation()) {
+        return Optional.of(child);
+      }
+    }
+    return Optional.empty();
+  }
+
+  public void setRightEndOfOperation(ExpressionVertex rightEndOfOperation) {
+    this.rightEndOfOperation = rightEndOfOperation;
+  }
+
+  public ExpressionVertex getRightEndOfOperation() {
+    return rightEndOfOperation;
+  }
+
+  public abstract boolean isRightEndOfOperation();
+
   public void setPosition(double x, double y) {
     this.x = x;
     this.y = y;
-    if (X == null) {
-      X = x;
-      START = this;
-    }
-    else if (x <= X) {
-      X = x;
-      START = this;
-    }
+  }
+
+  public void setX(double x) {
+    this.x = x;
+  }
+
+  public void setY(double y) {
+    this.y = y;
   }
 
   public double getX() {

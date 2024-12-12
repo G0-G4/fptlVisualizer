@@ -25,35 +25,25 @@ public class fptlVisualizer extends Application {
 
     Button buildGraph = new Button("отобразить");
 
-    Digraph<MyVertex, MyEdge> g = new DigraphEdgeList<>();
-    Digraph<ExpressionVertex, MyEdge> gg = new DigraphEdgeList<>();
+    Digraph<ExpressionVertex, MyEdge> g = new DigraphEdgeList<>();
     controller.setGraph(g);
-    controller.setGraph1(gg);
     SmartPlacementStrategy initialPlacement = new SmartCircularSortedPlacementStrategy();
-    SmartGraphPanel<ExpressionVertex, MyEdge> graphView1 = new SmartGraphPanel<>(gg, initialPlacement);
-    SmartGraphPanel<MyVertex, MyEdge> graphView = new SmartGraphPanel<>(g, initialPlacement);
+    SmartGraphPanel<ExpressionVertex, MyEdge> graphView = new SmartGraphPanel<>(g, initialPlacement);
     var pane = new ContentZoomScrollPane(graphView);
-    var pane1 = new ContentZoomScrollPane(graphView1);
     controller.setGraphPanel(graphView);
-    controller.setGraphPanelq(graphView1);
+    controller.setGraphPanelq(graphView);
     graphView.setMinHeight(500);
     graphView.setMinWidth(1024);
-    graphView1.setMinHeight(500);
-    graphView1.setMinWidth(1024);
-//    graphView.setAutomaticLayout(true);
-//    graphView1.layout();
-//    graphView1.layout();
-    root.getChildren().addAll(textArea, buildGraph, pane, pane1);
+    root.getChildren().addAll(textArea, buildGraph, pane);
 
     Scene scene = new Scene(root);
     stage.setScene(scene);
     stage.show();
     graphView.init();
-    graphView1.init();
 
     buildGraph.setOnAction((event) -> {
       controller.onButtonClick(textArea.getText());
-      graphView1.update();
+      graphView.update();
     });
   }
 

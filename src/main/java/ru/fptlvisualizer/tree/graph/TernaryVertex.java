@@ -1,26 +1,25 @@
 package ru.fptlvisualizer.tree.graph;
 
 public class TernaryVertex extends ExpressionVertex {
-  private ExpressionVertex condition;
-  private ExpressionVertex trueCondition;
-  private ExpressionVertex falseCondition;
 
-  public TernaryVertex(double x, double y) {
+  public TernaryVertex() {
     super("->");
   }
 
-  public TernaryVertex setCondition(ExpressionVertex condition) {
-    this.condition = condition;
-    return this;
+  @Override
+  public boolean isRightEndOfOperation() {
+    return getChildren().size() <= 1;
   }
 
-  public TernaryVertex setTrueCondition(ExpressionVertex trueCondition) {
-    this.trueCondition = trueCondition;
-    return this;
+  public ExpressionVertex getTrueBranch() {
+    return getChildren().get(0);
   }
 
-  public TernaryVertex setFalseCondition(ExpressionVertex falseCondition) {
-    this.falseCondition = falseCondition;
-    return this;
+  public ExpressionVertex getFalseBranch() {
+    return getChildren().get(2);
+  }
+
+  public ExpressionVertex getCondition() {
+    return getChildren().get(1);
   }
 }

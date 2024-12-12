@@ -21,3 +21,5 @@ c=(a->c,d)->e,g;
 (a1 * 0).equal -> 1, ((a1 * 1).sub.Fact * a1).mul
 
 a.(b*c*d).e.f
+
+(a*b*c) -> c, d
