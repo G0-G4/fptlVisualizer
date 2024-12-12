@@ -3,8 +3,8 @@ package ru.fptlvisualizer;
 import com.brunomnsilva.smartgraph.graph.Graph;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import ru.fptlvisualizer.parser.Parser;
 import ru.fptlvisualizer.tree.expression.Composition;
 import ru.fptlvisualizer.tree.expression.Concatenation;
@@ -17,20 +17,20 @@ import ru.fptlvisualizer.tree.graph.LiteralVertex;
 import ru.fptlvisualizer.tree.graph.TernaryVertex;
 
 public class Controller {
-  private Graph<ExpressionVertex, MyEdge> g;
-  private SmartGraphPanel<ExpressionVertex, MyEdge> panel;
+  private Graph<ExpressionVertex, ExpressionEdge> g;
+  private SmartGraphPanel<ExpressionVertex, ExpressionEdge> panel;
   int dx = 50;
   public ExpressionVertex s;
 
-  public void setGraph(Graph<ExpressionVertex, MyEdge> g) {
+  public void setGraph(Graph<ExpressionVertex, ExpressionEdge> g) {
     this.g = g;
   }
 
-  public void setGraphPanel(SmartGraphPanel<ExpressionVertex, MyEdge> panel) {
+  public void setGraphPanel(SmartGraphPanel<ExpressionVertex, ExpressionEdge> panel) {
     this.panel = panel;
   }
 
-  public void setGraphPanelq(SmartGraphPanel<ExpressionVertex, MyEdge> panel) {
+  public void setGraphPanelq(SmartGraphPanel<ExpressionVertex, ExpressionEdge> panel) {
     this.panel = panel;
   }
 
@@ -120,76 +120,77 @@ public class Controller {
   }
 
   private void drawGraph(ExpressionVertex start) {
-    draw(start,550, 100);
+    placeVerticies(start, 550, 100);
     panel.updateAndWait();
     for (var vertex : g.vertices()) {
       panel.setVertexPosition(vertex, vertex.element().getX(), vertex.element().getY());
     }
+    addEdges(start);
     panel.updateAndWait();
   }
 
-//  private double maxX(ExpressionVertex start, double max) {
-//    for (var vertex : start.getChildren()) {
-//     max = Math.max(max, maxX(vertex, max));
-//    }
-//    return max;
-//  }
+  private record maxXY(double maxX, double maxY) {
+  }
 
-  private void draw(ExpressionVertex start, double x, double y) {
+  private maxXY placeVerticies(ExpressionVertex start, double x, double y) {
     var openY = y;
     var openX = x;
 
     if (start instanceof ConcatenationVertex || start instanceof TernaryVertex) {
+      double X = 0;
       x += dx;
-      for(var vertex: start.getChildren()) {
-        draw(vertex, x, y);
-        y += dx;
+      boolean firstChild = true;
+      for (var vertex : start.getChildren()) {
+        var max = placeVerticies(vertex, x, firstChild ? y : y + dx);
+        X = Math.max(X, max.maxX);
+        y = Math.max(y, max.maxY);
+        firstChild = false;
       }
 
       var rightEndOfOperation = start.getRightEndOfOperation();
-      // TODO takes only first children should take into account transitive children
-      double closingX = start.getChildren().stream().map(ExpressionVertex::getX).max(Double::compare).get() + dx;
-//      double closingX = maxX(rightEndOfOperation, x) + dx;
+
+      var closingX = X + dx;
       g.insertVertex(start);
       g.insertVertex(rightEndOfOperation);
       start.setPosition(openX, openY);
-      rightEndOfOperation.setY(openY);
+      rightEndOfOperation.setPosition(closingX, openY);
 
+      maxXY max = new maxXY(closingX, openY);
       if (rightEndOfOperation.getComposed().isPresent()) {
-        draw(rightEndOfOperation.getComposed().get(), closingX + dx, openY);
+        max = placeVerticies(rightEndOfOperation.getComposed().get(), closingX + dx, openY);
       }
-      if (rightEndOfOperation.getChildren().size() == 1) {
-        var child = rightEndOfOperation.getChildren().get(0);
-        child.setX(Math.max(rightEndOfOperation.getX() + dx, child.getX()));
-      }
-//    } else if (start instanceof TernaryVertex exp) {
+      return new maxXY(Math.max(closingX, max.maxX), Math.max(y, max.maxY));
 
-    } else if (start instanceof LiteralVertex exp) {
+    } else {
+      var exp = (LiteralVertex) start;
       g.insertVertex(exp);
       exp.setPosition(x, y);
+      maxXY max = new maxXY(x, y);
       if (exp.getComposed().isPresent()) {
-        draw(exp.getComposed().get(), x + dx, y);
+        max = placeVerticies(exp.getComposed().get(), x + dx, y);
       }
-      else if (exp.getChildren().size() == 1) {
-        var rightEnd = exp.getChildren().get(0);
-         rightEnd.setX(Math.max( exp.getX() + dx, rightEnd.getX()));
-      }
-//      exp.getComposed().ifPresent(composed -> draw(composed, vertices, xx, yy));
+      return new maxXY(Math.max(x, max.maxX), Math.max(y, max.maxY));
+
     }
 
-//    for (var child : start.getChildren()) {
-//      if (!vertices.contains(child)) {
-//        g.insertVertex(child);
-//        child.setPosition(x, y);
-//        vertices.add(child);
-//      }
-//      try { //TODO remove try catch
-//        g.insertEdge(start, child, new MyEdge(start, child));
-//      } catch (Exception e) {
-//      }
-//      draw(child, vertices, x + dx, y);
-//      y += start.getChildren().size() > 1 ? dx : 0;
-//    }
+  }
+
+
+  private void addEdges(ExpressionVertex start) {
+    Stack<ExpressionVertex> stack = new Stack<>();
+    Set<ExpressionEdge> edges = new HashSet<>();
+    stack.push(start);
+    while (!stack.isEmpty()) {
+      var vertex = stack.pop();
+      for (var child : vertex.getChildren()) {
+        var edge = new ExpressionEdge(vertex, child);
+        if (!edges.contains(edge)) {
+          g.insertEdge(vertex, child, edge);
+          edges.add(edge);
+        }
+        stack.push(child);
+      }
+    }
   }
 
   private Expression graphToExpression(MyVertex curr) {

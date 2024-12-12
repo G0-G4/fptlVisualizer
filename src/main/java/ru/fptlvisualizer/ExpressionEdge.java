@@ -1,8 +1,8 @@
 package ru.fptlvisualizer;
 
-public record MyEdge(Object a, Object b, String name) {
+public record ExpressionEdge(Object a, Object b, String name) {
 
-  public MyEdge(Object a, Object b) {
+  public ExpressionEdge(Object a, Object b) {
     this(a, b, "");
   }
 
