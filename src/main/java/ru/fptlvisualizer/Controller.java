@@ -2,7 +2,9 @@ package ru.fptlvisualizer;
 
 import com.brunomnsilva.smartgraph.graph.Graph;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import ru.fptlvisualizer.parser.Parser;
@@ -12,6 +14,7 @@ import ru.fptlvisualizer.tree.expression.Expression;
 import ru.fptlvisualizer.tree.expression.Literal;
 import ru.fptlvisualizer.tree.expression.Ternary;
 import ru.fptlvisualizer.tree.graph.ConcatenationVertex;
+import ru.fptlvisualizer.tree.graph.ExpressionEdge;
 import ru.fptlvisualizer.tree.graph.ExpressionVertex;
 import ru.fptlvisualizer.tree.graph.LiteralVertex;
 import ru.fptlvisualizer.tree.graph.TernaryVertex;
@@ -40,11 +43,10 @@ public class Controller {
     s = convertToGraph(expression);
     System.out.println(g);
     drawGraph(s);
+    System.out.println(graphToExpression(s));
   }
 
   private ExpressionVertex convertToGraph(Expression exp) {
-    // TODO create tree from ExpressionVertex and then convert it to graph. then traverse it and add edges and set position of verticies
-    // TODO rewrite with custom grapgh implementation to simplify graph to expression conversion
     if (exp instanceof Composition composition) {
       var left = convertToGraph(composition.getLeft());
       var right = convertToGraph(composition.getRight());
@@ -63,9 +65,24 @@ public class Controller {
 
 
 //      TODO fix bug when (a*b)*(c*d) there * connects with *
-//      if (left.getType() == Expression.Type.CONCATENATION && right.getType() == Expression.Type.CONCATENATION) {
-//      }
-      if (left.getType() == Expression.Type.CONCATENATION) {
+      if (left.getType() == Expression.Type.CONCATENATION && right.getType() == Expression.Type.CONCATENATION) {
+        op = (ConcatenationVertex) inOutLeft;
+        cl = (ConcatenationVertex) inOutLeft.getLastOperand();
+        List<ExpressionVertex> children = new ArrayList<>();
+        for (var child : inOutRight.getChildren()) {
+          op.addChild(child);
+          children.add(child);
+        }
+        children.forEach(child -> child.removeParent(inOutRight));
+        List<ExpressionVertex> parents = new ArrayList<>();
+        for (var parent : inOutRight.getRightEndOfOperation().getParents()) {
+          parent.addChild(cl);
+          parents.add(parent);
+        }
+        parents.forEach(parent -> parent.removeChild(inOutRight.getRightEndOfOperation()));
+//        op.addChild(inOutRight);
+//        inOutRight.getLastOperand().addChild(cl);
+      } else if (left.getType() == Expression.Type.CONCATENATION) {
         op = (ConcatenationVertex) inOutLeft;
         cl = (ConcatenationVertex) inOutLeft.getLastOperand();
         op.addChild(inOutRight);
@@ -193,46 +210,40 @@ public class Controller {
     }
   }
 
-  private Expression graphToExpression(MyVertex curr) {
-    if ("*".equals(curr.getName())) {
+  private Expression graphToExpression(ExpressionVertex curr) {
+    if (curr instanceof ConcatenationVertex) {
       var expr = curr.getChildren().stream()
           .map(this::graphToExpression)
           .reduce(Concatenation::new)
           .get();
-      MyVertex opEnd = curr.getClosing();
-      if (opEnd != null && !opEnd.getChildren().isEmpty()) {
-        var right = graphToExpression(opEnd.getChildren().get(0));
-        return right != null ? new Composition(expr, graphToExpression(opEnd.getChildren().get(0))) : expr;
+      ExpressionVertex opEnd = curr.getRightEndOfOperation();
+      if (opEnd.getComposed().isPresent()) {
+        var right = graphToExpression(opEnd.getComposed().get());
+        return right != null ? new Composition(expr, right) : expr;
       }
       return expr;
 
-    } else if ("->".equals(curr.getName())) {
+    } else if (curr instanceof TernaryVertex ternary) {
       if (curr.getChildren().isEmpty()) {
         return null;
       }
-      System.out.println(curr);
-      var trueBranch = graphToExpression(curr.getChildren().get(0));
-      var falseBranch = graphToExpression(curr.getChildren().get(1));
-      var condition = graphToExpression(curr.getChildren().get(2));
+      var trueBranch = graphToExpression(ternary.getTrueBranch());
+      var falseBranch = graphToExpression(ternary.getFalseBranch());
+      var condition = graphToExpression(ternary.getCondition());
       var expr = new Ternary(condition, trueBranch, falseBranch);
-      MyVertex opEnd = curr.getClosing();
-      if (opEnd != null && !opEnd.getChildren().isEmpty()) {
-        var right = graphToExpression(opEnd.getChildren().get(0));
-        return right != null ? new Composition(expr, graphToExpression(opEnd.getChildren().get(0))) : expr;
+      var opEnd = curr.getRightEndOfOperation();
+      if (opEnd.getComposed().isPresent()) {
+        var right = graphToExpression(opEnd.getComposed().get());
+        return right != null ? new Composition(expr, right) : expr;
       }
       return expr;
     } else {
       var literal = new Literal(curr.getName());
-      MyVertex child = null;
-      if (curr.getChildren().size() == 1) {
-        child = curr.getChildren().get(0);
+      if (curr.getComposed().isPresent()) {
+        var child = curr.getComposed().get();
+        return new Composition(literal, graphToExpression(child));
       }
-
-      if (child == null || "*".equals(child.getName()) || "->".equals(child.getName())) {
-        return literal;
-      }
-      var right = graphToExpression(child);
-      return right != null ? new Composition(literal, graphToExpression(child)) : literal;
+      return literal;
     }
   }
 

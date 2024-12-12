@@ -12,17 +12,16 @@ public abstract class ExpressionVertex {
   private double x;
   private double y;
   private final int id;
-  private List<ExpressionVertex> children = new ArrayList<>();
+  // TODO different subclasses can have different numbers of children. Store them in subclasses
+  protected List<ExpressionVertex> children = new ArrayList<>();
+  private List<ExpressionVertex> parents = new ArrayList<>();
   protected ExpressionVertex lastOperand;
-  public static Double X = null;
-  public static List<ExpressionVertex> expressions = new ArrayList<>();
   private ExpressionVertex rightEndOfOperation;
 
   public ExpressionVertex(String name) {
     System.out.println("creating vertex " + name + " with x=" + x + ", y=" + y);
     this.id = ID++;
     this.name = name;
-    expressions.add(this);
   }
 
   public ExpressionVertex getLastOperand() {
@@ -37,11 +36,26 @@ public abstract class ExpressionVertex {
   }
 
   public void addChild(ExpressionVertex child) {
+    child.parents.add(this);
     children.add(child);
   }
 
   public List<ExpressionVertex> getChildren() {
     return Collections.unmodifiableList(children);
+  }
+
+  public List<ExpressionVertex> getParents() {
+    return Collections.unmodifiableList(parents);
+  }
+
+  public void removeChild(ExpressionVertex child) {
+    children.remove(child);
+//    child.parents.remove(this);
+  }
+
+  public void removeParent(ExpressionVertex parent) {
+    parents.remove(parent);
+    parent.children.remove(this);
   }
 
   public Optional<ExpressionVertex> getComposed() {
@@ -69,20 +83,16 @@ public abstract class ExpressionVertex {
     this.y = y;
   }
 
-  public void setX(double x) {
-    this.x = x;
-  }
-
-  public void setY(double y) {
-    this.y = y;
-  }
-
   public double getX() {
     return x;
   }
 
   public double getY() {
     return y;
+  }
+
+  public String getName() {
+    return name;
   }
 
   @Override

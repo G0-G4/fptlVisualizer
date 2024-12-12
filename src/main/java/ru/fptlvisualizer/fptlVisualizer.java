@@ -11,6 +11,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ru.fptlvisualizer.tree.graph.ExpressionEdge;
 import ru.fptlvisualizer.tree.graph.ExpressionVertex;
 
 public class fptlVisualizer extends Application {
