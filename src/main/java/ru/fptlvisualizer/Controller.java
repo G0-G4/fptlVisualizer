@@ -18,7 +18,7 @@ import ru.fptlvisualizer.tree.graph.LiteralVertex;
 import ru.fptlvisualizer.tree.graph.TernaryVertex;
 
 public class Controller {
-  private static final double START_X = 500;
+  private static final double START_X = 100;
   private static final double START_Y = 100;
   private static final int DELTA = 50;
 
