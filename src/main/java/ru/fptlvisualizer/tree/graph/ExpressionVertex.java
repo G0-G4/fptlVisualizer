@@ -24,9 +24,6 @@ public abstract class ExpressionVertex {
   }
 
   public ExpressionVertex getLastOperand() {
-    if (lastOperand == null) {
-      System.out.println();
-    }
     return lastOperand;
   }
 
@@ -55,6 +52,13 @@ public abstract class ExpressionVertex {
   public void removeParent(ExpressionVertex parent) {
     parents.remove(parent);
     parent.children.remove(this);
+  }
+
+  public void deleteFromGraph() {
+    List<ExpressionVertex> childrenCopy = new ArrayList<>(children);
+    List<ExpressionVertex> parentsCopy = new ArrayList<>(parents);
+    childrenCopy.forEach(v -> v.removeParent(this));
+    parentsCopy.forEach(v -> v.removeChild(this));
   }
 
   public Optional<ExpressionVertex> getComposed() {

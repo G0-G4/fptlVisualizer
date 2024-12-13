@@ -1,4 +1,4 @@
-package ru.fptlvisualizer.tree.graph;
+package ru.fptlvisualizer.tree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,10 @@ import ru.fptlvisualizer.tree.expression.Concatenation;
 import ru.fptlvisualizer.tree.expression.Expression;
 import ru.fptlvisualizer.tree.expression.Literal;
 import ru.fptlvisualizer.tree.expression.Ternary;
+import ru.fptlvisualizer.tree.graph.ConcatenationVertex;
+import ru.fptlvisualizer.tree.graph.ExpressionVertex;
+import ru.fptlvisualizer.tree.graph.LiteralVertex;
+import ru.fptlvisualizer.tree.graph.TernaryVertex;
 
 public class Convertor {
 

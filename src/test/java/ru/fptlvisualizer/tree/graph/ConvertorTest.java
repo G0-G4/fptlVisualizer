@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.fptlvisualizer.parser.Parser;
-import static ru.fptlvisualizer.tree.graph.Convertor.expressionToGraph;
-import static ru.fptlvisualizer.tree.graph.Convertor.graphToExpression;
+import static ru.fptlvisualizer.tree.Convertor.expressionToGraph;
+import static ru.fptlvisualizer.tree.Convertor.graphToExpression;
 
 class ConvertorTest {
 
